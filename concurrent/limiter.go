@@ -14,8 +14,12 @@ type ConcurrentLimiter struct {
 	runnungTasks     int32
 }
 
-// Creates new ConcurrencyLimiter with maximum number of
-// concurently executing tasks (fucntions)
+// Creates new ConcurrencyLimiter with DefaultConcurrencyLimit concurrency limit
+func DefaultConcurrentLimiter() *ConcurrentLimiter {
+	return NewConcurrentLimiter(DefaultConcurrencyLimit)
+}
+
+// Creates new ConcurrencyLimiter with specified concurrency limit
 func NewConcurrentLimiter(concurrencyLimit int) *ConcurrentLimiter {
 	if concurrencyLimit <= 0 {
 		concurrencyLimit = DefaultConcurrencyLimit
@@ -62,7 +66,7 @@ func (t *ConcurrentLimiter) Run(task func()) error {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				fmt.Println("Recovered panic in task", r)
+				fmt.Println("Recovered panic in goroutine", r)
 			}
 			atomic.AddInt32(&t.runnungTasks, -1)
 			t.availableSlots <- struct{}{}
