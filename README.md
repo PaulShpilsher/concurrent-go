@@ -1,6 +1,8 @@
-# Golang concurrent task runner
+# Simple Golang concurrent task runner
 
-A runner with limit of how many concurrent goroutines can be execiting at the same time.
+Task runner limiting how many concurrent goroutines can be executing at the same time.
+
+It uses channels to enforce maximum number of goroutines execiting simultaneously.
 
 ## Example
 ```go
