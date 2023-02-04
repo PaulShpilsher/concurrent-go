@@ -1,11 +1,12 @@
-package concurrent_test
+package runner_test
 
 import (
-	"psp/concurrent-worker-pool-go/concurrent"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/PaulShpilsher/concurrent-go/runner"
 )
 
 func smallDelay() {
@@ -13,12 +14,12 @@ func smallDelay() {
 }
 
 func TestRunnerDefault(t *testing.T) {
-	concurrentLimiter := concurrent.DefaultConcurrentRunner()
+	concurrentLimiter := runner.DefaultConcurrentRunner()
 	concurrentLimiter.Close()
 }
 
 func TestRunningBeforeClose(t *testing.T) {
-	runner := concurrent.DefaultConcurrentRunner()
+	runner := runner.DefaultConcurrentRunner()
 
 	err := runner.Run(func() {})
 	if err != nil {
@@ -29,7 +30,7 @@ func TestRunningBeforeClose(t *testing.T) {
 }
 
 func TestNoRunningAfterClose(t *testing.T) {
-	runner := concurrent.DefaultConcurrentRunner()
+	runner := runner.DefaultConcurrentRunner()
 	runner.Close()
 
 	err := runner.Run(func() {})
@@ -39,7 +40,7 @@ func TestNoRunningAfterClose(t *testing.T) {
 }
 
 func TestExectuteHappyPath(t *testing.T) {
-	runner := concurrent.NewConcurrenRunner(25)
+	runner := runner.NewConcurrentRunner(25)
 
 	const numTasks = 1000
 	cnt := int32(0)
@@ -62,7 +63,7 @@ func TestConcurrencyLimit(t *testing.T) {
 	const limit = 13
 	const numTasks = 10000
 
-	runner := concurrent.NewConcurrenRunner(limit)
+	runner := runner.NewConcurrentRunner(limit)
 
 	mutex := &sync.Mutex{}
 	failed := false

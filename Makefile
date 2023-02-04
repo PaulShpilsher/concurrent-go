@@ -1,6 +1,6 @@
 .PHONY: test
 test:
-	go test -v ./concurrent/runner_test.go 
+	go test -v ./runner/runner_test.go 
 
 .PHONY: test
 run:

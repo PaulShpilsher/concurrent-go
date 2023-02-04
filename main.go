@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"psp/concurrent-worker-pool-go/concurrent"
 	"time"
+
+	"github.com/PaulShpilsher/concurrent-go/runner"
 )
 
 func worker(id int) {
@@ -23,7 +24,7 @@ func main() {
 
 	fmt.Printf("Executing %d tasks with concurrency limit %d\n", tasks, limit)
 
-	runner := concurrent.NewConcurrenRunner(limit)
+	runner := runner.NewConcurrentRunner(limit)
 	for i := 0; i < tasks; i++ {
 		id := i
 		runner.Run(func() { worker(id) })

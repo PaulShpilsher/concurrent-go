@@ -1,3 +1,3 @@
-module psp/concurrent-worker-pool-go
+module github.com/PaulShpilsher/concurrent-go
 
 go 1.19

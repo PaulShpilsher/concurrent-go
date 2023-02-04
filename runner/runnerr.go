@@ -1,4 +1,4 @@
-package concurrent
+package runner
 
 import (
 	"errors"
@@ -16,13 +16,13 @@ type ConcurrentRunner struct {
 
 // Creates new ConcurrentRunner with DefaultConcurrencyLimit concurrency limit
 func DefaultConcurrentRunner() *ConcurrentRunner {
-	return NewConcurrenRunner(DefaultConcurrencyLimit)
+	return NewConcurrentRunner(DefaultConcurrencyLimit)
 }
 
 // Creates new ConcurrentRunner with specified concurrency limit
-func NewConcurrenRunner(concurrencyLimit int) *ConcurrentRunner {
+func NewConcurrentRunner(concurrencyLimit int) *ConcurrentRunner {
 	if concurrencyLimit <= 0 {
-		panic("concurrencyLimit must be > 0")
+		panic("concurrency limit must be > 0")
 	}
 
 	slots := make(chan struct{}, concurrencyLimit)

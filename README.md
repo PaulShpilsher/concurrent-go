@@ -9,7 +9,11 @@ Panic inside a goroutine is handled and is not going to kill the program.  The p
 ## Example
 
 ```go
- runner := concurrent.NewConcurrenRunner(12)
+import "github.com/PaulShpilsher/concurrent-go/runner"
+```
+
+```go
+ runner := runner.NewConcurrentRunner(12)
  
  for i := 0; i < 1000; i++ {
   runner.Run(func() {
