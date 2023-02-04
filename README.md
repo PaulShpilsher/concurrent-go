@@ -1,25 +1,36 @@
 # Golang concurrent task runner with quota
 
-Goroutine runner limiting how many goroutines can be executing at the same time.
+A concurrent function runner with quota on how many functions can be executing at the same time.
 
-It uses channels to enforce maximum number of goroutines execiting simultaneously.  When the concurency quota is reached scheduling new executions will be blocked until other tasks finish.
+## Features
 
-Panic inside a goroutine is handled and is not going to kill the program.  The panic message however is sent to the console.
+It uses channels to enforce maximum number of goroutines executing simultaneously. It also maintains an atomic counter of how many functions are executing at any point of time.
 
-## Example
+When the concurrency quota is reached scheduling new function executions is blocked until some of the running functions finish.
+
+A panic inside a goroutine is handled by logging it to console, and will not stop program execution.
+
+## Usage
+
+```bash
+go get github.com/PaulShpilsher/concurrent-go
+```
 
 ```go
 import "github.com/PaulShpilsher/concurrent-go/runner"
 ```
 
 ```go
- runner := runner.NewConcurrentRunner(12)
+ concurrentRunn, err := runner.NewConcurrentRunner(12)
+ if err != nil {
+    panic(err.Error())
+ }
  
  for i := 0; i < 1000; i++ {
-  runner.Run(func() {
+  concurrentRunn.Run(func() {
    // task's code to exectute
   })
  }
 
- runner.Close()
+ concurrentRunn.Close()
 ```
