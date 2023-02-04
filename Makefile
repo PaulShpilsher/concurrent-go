@@ -3,5 +3,5 @@ test:
 	go test -v ./runner/runner_test.go 
 
 .PHONY: test
-run:
-	go run main.go
+run-example:
+	go run ./examples/main.go -limit=10 -tasks=1000
