@@ -1,6 +1,7 @@
 package runner_test
 
 import (
+	"math/rand"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -10,7 +11,7 @@ import (
 )
 
 func smallDelay() {
-	time.Sleep(time.Millisecond)
+	time.Sleep(time.Duration(rand.Intn(50)) * time.Millisecond)
 }
 
 func TestRunnerDefault(t *testing.T) {

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/PaulShpilsher/concurrent-go/runner"
@@ -10,7 +11,7 @@ import (
 
 func worker(id int) {
 	fmt.Println("worker start", id)
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
 	fmt.Println("worker end  ", id)
 }
 
@@ -24,6 +25,7 @@ func main() {
 
 	fmt.Printf("Executing %d tasks with concurrency limit %d\n", tasks, limit)
 
+	rand.Seed(time.Now().UnixNano())
 	r, _ := runner.NewConcurrencyRunner(limit)
 	for i := 0; i < tasks; i++ {
 		id := i
