@@ -8,12 +8,15 @@ import (
 
 const DefaultConcurrencyLimit = 50
 
-type TaskRunner struct {
-	availableSlots chan struct{}
-	runnungTasks   int32
+type ConcurrentLimiter struct {
+	concurrencyLimit int
+	availableSlots   chan struct{}
+	runnungTasks     int32
 }
 
-func NewTaskRunner(concurrencyLimit int) *TaskRunner {
+// Creates new ConcurrencyLimiter with maximum number of
+// concurently executing tasks (fucntions)
+func NewConcurrentLimiter(concurrencyLimit int) *ConcurrentLimiter {
 	if concurrencyLimit <= 0 {
 		concurrencyLimit = DefaultConcurrencyLimit
 	}
@@ -23,13 +26,30 @@ func NewTaskRunner(concurrencyLimit int) *TaskRunner {
 		slots <- struct{}{}
 	}
 
-	return &TaskRunner{
-		availableSlots: slots,
-		runnungTasks:   0,
+	return &ConcurrentLimiter{
+		concurrencyLimit: concurrencyLimit,
+		availableSlots:   slots,
+		runnungTasks:     0,
 	}
 }
 
-func (t *TaskRunner) ExecuteTask(task func()) error {
+// Closes ConcurrencyLimiter
+// But first it waits for all pending tasks to complete
+func (t *ConcurrentLimiter) Close() {
+	for i := 0; i < t.concurrencyLimit; i++ {
+		<-t.availableSlots
+	}
+	close(t.availableSlots)
+}
+
+// Gets number of currently executing tasks
+func (t *ConcurrentLimiter) GetNumberOfRunningTasks() int {
+	return int(atomic.LoadInt32(&t.runnungTasks))
+}
+
+// Executes a task concurrently
+// if there are no available slots it blocks until one becomes available
+func (t *ConcurrentLimiter) Run(task func()) error {
 	if task == nil {
 		return errors.New("nil task argument")
 	}
