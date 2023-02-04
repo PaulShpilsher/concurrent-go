@@ -10,7 +10,6 @@ import (
 const DefaultQuota = 16
 
 type ConcurrencyRunner struct {
-	quota          int
 	freeSlots      chan struct{}
 	executingCount int32
 }
@@ -30,7 +29,6 @@ func NewConcurrencyRunner(quota int) (*ConcurrencyRunner, error) {
 	}
 
 	return &ConcurrencyRunner{
-		quota:          quota,
 		freeSlots:      slots,
 		executingCount: 0,
 	}, nil
@@ -40,7 +38,7 @@ func NewConcurrencyRunner(quota int) (*ConcurrencyRunner, error) {
 // Then releases internally used resources.
 // No more calls to Run() are possible.
 func (t *ConcurrencyRunner) Close() {
-	for i := 0; i < t.quota; i++ {
+	for i := 0; i < cap(t.freeSlots); i++ {
 		<-t.freeSlots
 	}
 	close(t.freeSlots)
