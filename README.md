@@ -21,16 +21,16 @@ import "github.com/PaulShpilsher/concurrent-go/runner"
 ```
 
 ```go
- concurrentRunn, err := runner.NewConcurrentRunner(12)
+ concurrentRunner, err := runner.NewConcurrentRunner(12)
  if err != nil {
     panic(err.Error())
  }
  
  for i := 0; i < 1000; i++ {
-  concurrentRunn.Run(func() {
+  concurrentRunner.Run(func() {
    // task's code to exectute
   })
  }
 
- concurrentRunn.Close()
+ concurrentRunner.Close()
 ```
