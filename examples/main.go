@@ -30,6 +30,5 @@ func main() {
 		runner.Run(func() { worker(id) })
 	}
 
-	runner.Close()
-
+	runner.Close() // waits for all pending tasks to complete and closes runner
 }
