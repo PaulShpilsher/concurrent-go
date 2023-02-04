@@ -3,73 +3,73 @@ package runner
 import (
 	"errors"
 	"fmt"
+	"math"
 	"sync/atomic"
 )
 
-const DefaultConcurrencyLimit = 50
+const DefaultQuota = 16
 
-type ConcurrentRunner struct {
-	concurrencyLimit int
-	availableSlots   chan struct{}
-	runnungTasks     int32
+type ConcurrencyRunner struct {
+	quota          int
+	freeSlots      chan struct{}
+	executingCount int32
 }
 
-// Creates new ConcurrentRunner with DefaultConcurrencyLimit concurrency limit
-func DefaultConcurrentRunner() *ConcurrentRunner {
-	return NewConcurrentRunner(DefaultConcurrencyLimit)
-}
-
-// Creates new ConcurrentRunner with specified concurrency limit
-func NewConcurrentRunner(concurrencyLimit int) *ConcurrentRunner {
-	if concurrencyLimit <= 0 {
-		panic("concurrency limit must be > 0")
+// Creates new ConcurrencyRunner with specified quota of maximum concurrently running functions
+// Returnss new;y constructed &ConcurrencyRunner struct
+// Error if "quota" argument is out of range [1..math.MaxInt32]
+func NewConcurrencyRunner(quota int) (*ConcurrencyRunner, error) {
+	if quota <= 0 || quota > math.MaxInt32 {
+		return &ConcurrencyRunner{}, fmt.Errorf("quota must be in range [1..%d]", math.MaxInt32)
 	}
 
-	slots := make(chan struct{}, concurrencyLimit)
-	for i := 0; i < concurrencyLimit; i++ {
+	slots := make(chan struct{}, quota)
+	for i := 0; i < quota; i++ {
 		slots <- struct{}{}
 	}
 
-	return &ConcurrentRunner{
-		concurrencyLimit: concurrencyLimit,
-		availableSlots:   slots,
-		runnungTasks:     0,
+	return &ConcurrencyRunner{
+		quota:          quota,
+		freeSlots:      slots,
+		executingCount: 0,
+	}, nil
+}
+
+// Waits for all still running functions to complete,
+// Then releases internally used resources.
+// No more calls to Run() are possible.
+func (t *ConcurrencyRunner) Close() {
+	for i := 0; i < t.quota; i++ {
+		<-t.freeSlots
 	}
+	close(t.freeSlots)
 }
 
-// Closes ConcurrencyLimiter
-// But first it waits for all pending tasks to complete
-func (t *ConcurrentRunner) Close() {
-	for i := 0; i < t.concurrencyLimit; i++ {
-		<-t.availableSlots
-	}
-	close(t.availableSlots)
+// Gets number of currently executing routines
+func (t *ConcurrencyRunner) GetNumberOfRunningTasks() int {
+	return int(atomic.LoadInt32(&t.executingCount))
 }
 
-// Gets number of currently executing tasks
-func (t *ConcurrentRunner) GetNumberOfRunningTasks() int {
-	return int(atomic.LoadInt32(&t.runnungTasks))
-}
-
-// Executes a task concurrently
-// if there are no available slots it blocks until one becomes available
-func (t *ConcurrentRunner) Run(task func()) error {
+// Concurrently executes a function wrapped in a goroutine.
+// Hoever if the quota of currently running functions are reached
+// this blocks until one of the rinning function completes and "makes room"
+func (t *ConcurrencyRunner) Run(task func()) error {
 	if task == nil {
-		return errors.New("nil task argument")
+		return errors.New("nil  argument")
 	}
 
-	if _, ok := <-t.availableSlots; !ok {
+	if _, ok := <-t.freeSlots; !ok {
 		return errors.New("channel closed")
 	}
 
-	atomic.AddInt32(&t.runnungTasks, 1)
+	atomic.AddInt32(&t.executingCount, 1)
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
 				fmt.Println("Recovered panic in goroutine", r)
 			}
-			atomic.AddInt32(&t.runnungTasks, -1)
-			t.availableSlots <- struct{}{}
+			atomic.AddInt32(&t.executingCount, -1)
+			t.freeSlots <- struct{}{}
 		}()
 
 		task()
