@@ -8,21 +8,21 @@ import (
 
 const DefaultConcurrencyLimit = 50
 
-type ConcurrentLimiter struct {
+type ConcurrentRunner struct {
 	concurrencyLimit int
 	availableSlots   chan struct{}
 	runnungTasks     int32
 }
 
-// Creates new ConcurrencyLimiter with DefaultConcurrencyLimit concurrency limit
-func DefaultConcurrentLimiter() *ConcurrentLimiter {
-	return NewConcurrentLimiter(DefaultConcurrencyLimit)
+// Creates new ConcurrentRunner with DefaultConcurrencyLimit concurrency limit
+func DefaultConcurrentRunner() *ConcurrentRunner {
+	return NewConcurrenRunner(DefaultConcurrencyLimit)
 }
 
-// Creates new ConcurrencyLimiter with specified concurrency limit
-func NewConcurrentLimiter(concurrencyLimit int) *ConcurrentLimiter {
+// Creates new ConcurrentRunner with specified concurrency limit
+func NewConcurrenRunner(concurrencyLimit int) *ConcurrentRunner {
 	if concurrencyLimit <= 0 {
-		concurrencyLimit = DefaultConcurrencyLimit
+		panic("concurrencyLimit must be > 0")
 	}
 
 	slots := make(chan struct{}, concurrencyLimit)
@@ -30,7 +30,7 @@ func NewConcurrentLimiter(concurrencyLimit int) *ConcurrentLimiter {
 		slots <- struct{}{}
 	}
 
-	return &ConcurrentLimiter{
+	return &ConcurrentRunner{
 		concurrencyLimit: concurrencyLimit,
 		availableSlots:   slots,
 		runnungTasks:     0,
@@ -39,7 +39,7 @@ func NewConcurrentLimiter(concurrencyLimit int) *ConcurrentLimiter {
 
 // Closes ConcurrencyLimiter
 // But first it waits for all pending tasks to complete
-func (t *ConcurrentLimiter) Close() {
+func (t *ConcurrentRunner) Close() {
 	for i := 0; i < t.concurrencyLimit; i++ {
 		<-t.availableSlots
 	}
@@ -47,13 +47,13 @@ func (t *ConcurrentLimiter) Close() {
 }
 
 // Gets number of currently executing tasks
-func (t *ConcurrentLimiter) GetNumberOfRunningTasks() int {
+func (t *ConcurrentRunner) GetNumberOfRunningTasks() int {
 	return int(atomic.LoadInt32(&t.runnungTasks))
 }
 
 // Executes a task concurrently
 // if there are no available slots it blocks until one becomes available
-func (t *ConcurrentLimiter) Run(task func()) error {
+func (t *ConcurrentRunner) Run(task func()) error {
 	if task == nil {
 		return errors.New("nil task argument")
 	}

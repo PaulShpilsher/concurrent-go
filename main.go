@@ -23,7 +23,7 @@ func main() {
 
 	fmt.Printf("Executing %d tasks with concurrency limit %d\n", tasks, limit)
 
-	runner := concurrent.NewConcurrentLimiter(limit)
+	runner := concurrent.NewConcurrenRunner(limit)
 	for i := 0; i < tasks; i++ {
 		id := i
 		runner.Run(func() { worker(id) })
