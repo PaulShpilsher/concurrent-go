@@ -6,20 +6,20 @@ import (
 	"sync/atomic"
 )
 
-const DefaultMaxTasks = 50
+const DefaultConcurrencyLimit = 50
 
 type TaskRunner struct {
 	availableSlots chan struct{}
 	runnungTasks   int32
 }
 
-func NewTaskRunner(limit int) *TaskRunner {
-	if limit <= 0 {
-		limit = DefaultMaxTasks
+func NewTaskRunner(concurrencyLimit int) *TaskRunner {
+	if concurrencyLimit <= 0 {
+		concurrencyLimit = DefaultConcurrencyLimit
 	}
 
-	slots := make(chan struct{}, limit)
-	for i := 0; i < limit; i++ {
+	slots := make(chan struct{}, concurrencyLimit)
+	for i := 0; i < concurrencyLimit; i++ {
 		slots <- struct{}{}
 	}
 
