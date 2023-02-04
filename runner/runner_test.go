@@ -14,45 +14,49 @@ func smallDelay() {
 }
 
 func TestRunnerDefault(t *testing.T) {
-	concurrentLimiter := runner.DefaultConcurrentRunner()
-	concurrentLimiter.Close()
+	r, err := runner.NewConcurrencyRunner(runner.DefaultQuota)
+	if err != nil {
+		t.Error("NewConcurrencyRunner failed", err)
+	}
+	r.Close()
+
 }
 
 func TestRunningBeforeClose(t *testing.T) {
-	runner := runner.DefaultConcurrentRunner()
+	r, _ := runner.NewConcurrencyRunner(runner.DefaultQuota)
 
-	err := runner.Run(func() {})
+	err := r.Run(func() {})
 	if err != nil {
 		t.Error("Execution failed")
 	}
 
-	runner.Close()
+	r.Close()
 }
 
 func TestNoRunningAfterClose(t *testing.T) {
-	runner := runner.DefaultConcurrentRunner()
-	runner.Close()
+	r, _ := runner.NewConcurrencyRunner(runner.DefaultQuota)
+	r.Close()
 
-	err := runner.Run(func() {})
+	err := r.Run(func() {})
 	if err == nil {
 		t.Error("Executing after close should not be allowed")
 	}
 }
 
 func TestExectuteHappyPath(t *testing.T) {
-	runner := runner.NewConcurrentRunner(25)
+	r, _ := runner.NewConcurrencyRunner(25)
 
 	const numTasks = 1000
 	cnt := int32(0)
 
 	for i := 0; i < numTasks; i++ {
-		runner.Run(func() {
+		r.Run(func() {
 			atomic.AddInt32(&cnt, 1)
 			smallDelay()
 		})
 	}
 
-	runner.Close()
+	r.Close()
 
 	if cnt != numTasks {
 		t.Error("Not all tasks had executed")
@@ -60,18 +64,18 @@ func TestExectuteHappyPath(t *testing.T) {
 }
 
 func TestConcurrencyLimit(t *testing.T) {
-	const limit = 13
+	const quota = 13
 	const numTasks = 10000
 
-	runner := runner.NewConcurrentRunner(limit)
+	r, _ := runner.NewConcurrencyRunner(quota)
 
 	mutex := &sync.Mutex{}
 	failed := false
 
 	for i := 0; i < numTasks; i++ {
-		runner.Run(func() {
-			cnt := runner.GetNumberOfRunningTasks()
-			if cnt > limit {
+		r.Run(func() {
+			cnt := r.GetNumberOfRunningTasks()
+			if cnt > quota {
 				mutex.Lock()
 				failed = true
 				mutex.Unlock()
@@ -79,7 +83,7 @@ func TestConcurrencyLimit(t *testing.T) {
 		})
 	}
 
-	runner.Close()
+	r.Close()
 
 	if failed {
 		t.Error("Concurrency limit broken.")

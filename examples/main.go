@@ -24,11 +24,11 @@ func main() {
 
 	fmt.Printf("Executing %d tasks with concurrency limit %d\n", tasks, limit)
 
-	runner := runner.NewConcurrentRunner(limit)
+	r, _ := runner.NewConcurrencyRunner(limit)
 	for i := 0; i < tasks; i++ {
 		id := i
-		runner.Run(func() { worker(id) })
+		r.Run(func() { worker(id) })
 	}
 
-	runner.Close() // waits for all pending tasks to complete and closes runner
+	r.Close() // waits for all pending tasks to complete and closes runner
 }
