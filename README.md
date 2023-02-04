@@ -1,4 +1,4 @@
-# Golang concurrent task runner with quota
+# Golang concurrent function runner with quota
 
 A concurrent function runner with quota on how many functions can be executing at the same time.
 
