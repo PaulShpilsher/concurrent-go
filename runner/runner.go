@@ -50,4 +50,6 @@ func (t *TaskRunner) ExecuteTask(task func()) error {
 
 		task()
 	}()
+
+	return nil
 }
