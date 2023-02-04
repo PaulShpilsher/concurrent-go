@@ -15,8 +15,9 @@ type ConcurrencyRunner struct {
 	executingCount int32
 }
 
-// Creates new ConcurrencyRunner with specified quota of maximum concurrently running functions
-// Returnss new;y constructed &ConcurrencyRunner struct
+// Creates new ConcurrencyRunner with specified quota on
+// the maximum number of concurrently running functions.
+// Returns &ConcurrencyRunner struct
 // Error if "quota" argument is out of range [1..math.MaxInt32]
 func NewConcurrencyRunner(quota int) (*ConcurrencyRunner, error) {
 	if quota <= 0 || quota > math.MaxInt32 {
@@ -51,8 +52,8 @@ func (t *ConcurrencyRunner) GetNumberOfRunningTasks() int {
 }
 
 // Concurrently executes a function wrapped in a goroutine.
-// Hoever if the quota of currently running functions are reached
-// this blocks until one of the rinning function completes and "makes room"
+// If the quota of currently running functions is reached
+// a call to this function will block until another running function finishes.
 func (t *ConcurrencyRunner) Run(task func()) error {
 	if task == nil {
 		return errors.New("nil  argument")
