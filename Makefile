@@ -4,4 +4,4 @@ test:
 
 .PHONY: test
 run-example:
-	go run ./examples/main.go -limit=10 -tasks=1000
+	go run ./examples/main.go -limit=10 -tasks=500
