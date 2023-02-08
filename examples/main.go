@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/PaulShpilsher/concurrent-go/concurrency/semaphore/runner"
+	"github.com/PaulShpilsher/concurrent-go/concurrency/sync/runner"
 )
 
 func worker(id int) {
@@ -26,7 +26,7 @@ func main() {
 	fmt.Printf("Executing %d tasks with concurrency limit %d\n", numbeOfTasks, quota)
 
 	//r, _ := runner.NewConcurrencyRunner(quota)
-	r := runner.NewRunner(quota)
+	r := runner.New(quota)
 	for i := 0; i < numbeOfTasks; i++ {
 		id := i
 		r.Run(func() { worker(id) })

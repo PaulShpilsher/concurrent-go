@@ -4,4 +4,5 @@ type Runner interface {
 	Run(task func()) error
 	WaitAndClose()
 	GetNumberOfRunningTasks() int
+	GetQuota() int
 }
