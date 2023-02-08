@@ -61,6 +61,7 @@ func (r *channelRunner) GetNumberOfRunningTasks() int {
 	return int(atomic.LoadInt32(&r.executingCount))
 }
 
+// Returns the quota limit
 func (r *channelRunner) GetQuota() int {
 	return r.quota
 }
