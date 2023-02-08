@@ -7,36 +7,42 @@ import (
 	"testing"
 	"time"
 
-	"github.com/PaulShpilsher/concurrent-go/runner"
+	"github.com/PaulShpilsher/concurrent-go/concurrency/chan/runner"
 )
 
 func smallDelay() {
 	time.Sleep(time.Duration(rand.Intn(50)) * time.Millisecond)
 }
 
-func TestRunnerDefault(t *testing.T) {
-	r, err := runner.NewConcurrencyRunner(runner.DefaultQuota)
-	if err != nil {
-		t.Error("NewConcurrencyRunner failed", err)
+func TestRunnerNewDefault(t *testing.T) {
+	r := runner.New(0)
+	if r == nil {
+		t.Error("Failed to construct new runner with defaults")
 	}
-	r.Close()
-
+	r.WaitAndClose()
+}
+func TestRunnerNew(t *testing.T) {
+	r := runner.New(5)
+	if r == nil {
+		t.Error("Failed to construct new runner")
+	}
+	r.WaitAndClose()
 }
 
 func TestRunningBeforeClose(t *testing.T) {
-	r, _ := runner.NewConcurrencyRunner(runner.DefaultQuota)
+	r := runner.New(5)
 
 	err := r.Run(func() {})
 	if err != nil {
 		t.Error("Execution failed")
 	}
 
-	r.Close()
+	r.WaitAndClose()
 }
 
 func TestNoRunningAfterClose(t *testing.T) {
-	r, _ := runner.NewConcurrencyRunner(runner.DefaultQuota)
-	r.Close()
+	r := runner.New(5)
+	r.WaitAndClose()
 
 	err := r.Run(func() {})
 	if err == nil {
@@ -44,8 +50,17 @@ func TestNoRunningAfterClose(t *testing.T) {
 	}
 }
 
+func TestRunningNilTask(t *testing.T) {
+	r := runner.New(5)
+	err := r.Run(nil)
+	if err == nil {
+		t.Error("Failed to error on nil argument")
+	}
+	r.WaitAndClose()
+}
+
 func TestExectuteHappyPath(t *testing.T) {
-	r, _ := runner.NewConcurrencyRunner(25)
+	r := runner.New(25)
 
 	const numTasks = 1000
 	cnt := int32(0)
@@ -57,7 +72,7 @@ func TestExectuteHappyPath(t *testing.T) {
 		})
 	}
 
-	r.Close()
+	r.WaitAndClose()
 
 	if cnt != numTasks {
 		t.Error("Not all tasks had executed")
@@ -68,7 +83,7 @@ func TestConcurrencyLimit(t *testing.T) {
 	const quota = 13
 	const numTasks = 10000
 
-	r, _ := runner.NewConcurrencyRunner(quota)
+	r := runner.New(quota)
 
 	mutex := &sync.Mutex{}
 	failed := false
@@ -84,9 +99,17 @@ func TestConcurrencyLimit(t *testing.T) {
 		})
 	}
 
-	r.Close()
+	r.WaitAndClose()
 
 	if failed {
 		t.Error("Concurrency limit broken.")
+	}
+}
+
+func TestQuota(t *testing.T) {
+	r := runner.New(10)
+	actual := r.GetQuota()
+	if actual != 10 {
+		t.Errorf("Exoected quota 10, actual %d", actual)
 	}
 }

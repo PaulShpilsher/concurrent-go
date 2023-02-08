@@ -50,6 +50,15 @@ func TestNoRunningAfterClose(t *testing.T) {
 	}
 }
 
+func TestRunningNilTask(t *testing.T) {
+	r := runner.New(5)
+	err := r.Run(nil)
+	if err == nil {
+		t.Error("Failed to error on nil argument")
+	}
+	r.WaitAndClose()
+}
+
 func TestExectuteHappyPath(t *testing.T) {
 	r := runner.New(25)
 

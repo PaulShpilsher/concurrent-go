@@ -2,7 +2,7 @@ package runner
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
 	"math"
 	"runtime"
@@ -46,9 +46,12 @@ func New(quota int) concurrency.Runner {
 // a call to this function will block until another running
 // function finishes.
 func (r *semaphoreRunner) Run(task func()) error {
+	if task == nil {
+		return errors.New("nil  argument")
+	}
+
 	if r.closed {
-		err := fmt.Errorf("runned closed")
-		return err
+		return errors.New("runned closed")
 	}
 
 	if err := r.sem.Acquire(r.ctx, 1); err != nil {
@@ -72,7 +75,7 @@ func (r *semaphoreRunner) Run(task func()) error {
 	return nil
 }
 
-// Waits for all already running functions to complete,
+// Waits for all running functions to complete,
 // Then releases internally used resources.
 // No more calls to Run() are possible.
 func (r *semaphoreRunner) WaitAndClose() {
