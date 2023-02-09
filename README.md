@@ -73,7 +73,7 @@ Use the runner
 
 The exapmples are in the ./examples/ directory.
 
-Running exaples:
+Running examples using make utility:
 
 ```shell
 make run-example-channel
@@ -85,8 +85,19 @@ or
 make run-example-sync
 ```
 
+## Testing
 
-- Sync based exapmple in the ./examples/sync/ directory
+Running unit tests using make utility:
+
+```shell
+make test-channel-runner
+```
+
+or
+
+```shell
+make test-sync-runner
+```
 
 ## Acknowledgements <a name = "acknowledgement"></a>
 
