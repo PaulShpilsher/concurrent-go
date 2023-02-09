@@ -10,7 +10,7 @@ It also maintains an atomic counter of how many functions are executing at any p
 
 ## Implementation
 
-There are two flavors of concurrent runners are imlemented.  One that uses semaphore synchronization primitive and the other uses channels.
+There are two flavors of concurrent runners are implemented.  One that uses semaphore synchronization primitive and the other uses channels.
 
 Both have common functionality described by the interface:
 
