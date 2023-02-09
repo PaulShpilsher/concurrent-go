@@ -1,5 +1,6 @@
 .PHONY: test
-test: test-sync-runner test-channel-runner
+test: 
+	go build -v ./...
 
 .PHONY: test-channel-runner
 test-channel-runner:

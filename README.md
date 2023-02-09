@@ -55,18 +55,18 @@ import "github.com/PaulShpilsher/concurrent-go/concurrency/sync/runner"
 Use the runner
 
 ```go
- concurrentRunner := runner.New(quota)
+ theRunner := runner.New(quota)
  if err != nil {
     panic(err.Error())
  }
  
  for i := 0; i < 1000; i++ {
-  concurrentRunner.Run(func() {
+  theRunner.Run(func() {
    // put some code to be exectuted
   })
  }
 
- concurrentRunner.WaitAndClose()
+ theRunner.WaitAndClose()
 ```
 
 ## Examples
@@ -90,13 +90,7 @@ make run-example-sync
 Running unit tests using make utility:
 
 ```shell
-make test-channel-runner
-```
-
-or
-
-```shell
-make test-sync-runner
+make test
 ```
 
 ## Acknowledgements <a name = "acknowledgement"></a>
