@@ -4,33 +4,67 @@ A concurrent function runner with quota on how many functions can be executing a
 
 ## Features
 
-It uses channels to enforce maximum number of goroutines executing simultaneously. It also maintains an atomic counter of how many functions are executing at any point of time.
+A concurrent runner purpose is to enforce maximum number of goroutines that can execute simultaneously (quota).  When the quota is reached scheduling new function executions is blocked until some of the running functions are finished.
 
-When the concurrency quota is reached scheduling new function executions is blocked until some of the running functions finish.
+It also maintains an atomic counter of how many functions are executing at any point of time.
 
-A panic inside a goroutine is handled by logging it to console, and will not stop program execution.
+## Implementation
+
+There are two flavors of concurrent runners are imlemented.  One that uses semaphore synchronization primitive and the other uses channels.
+
+Both have common functionality described by the interface:
+
+```go
+type Runner interface {
+   // Concurrently executes a function wrapped in a goroutine.
+   Run(task func()) error
+
+   // Waits for all running functions to complete and frees resources.
+   WaitAndClose()
+
+   // Returns the number of currently executing functions.
+   GetNumberOfRunningTasks() int
+
+   // Returns the quota limit
+   GetQuota() int
+}
+```
 
 ## Usage
+
+Get the package
 
 ```bash
 go get github.com/PaulShpilsher/concurrent-go
 ```
 
-```go
-import "github.com/PaulShpilsher/concurrent-go/runner"
-```
+In code import runner.
+
+To use channel-based runner:
 
 ```go
- concurrentRunner, err := runner.NewConcurrentRunner(12)
+import "github.com/PaulShpilsher/concurrent-go/concurrency/chan/runner"
+```
+
+To use sync-based runner:
+
+```go
+import "github.com/PaulShpilsher/concurrent-go/concurrency/sync/runner"
+```
+
+Use the runner
+
+```go
+ concurrentRunner := runner.New(quota)
  if err != nil {
     panic(err.Error())
  }
  
  for i := 0; i < 1000; i++ {
   concurrentRunner.Run(func() {
-   // task's code to exectute
+   // put some code to be exectuted
   })
  }
 
- concurrentRunner.Close()
+ concurrentRunner.WaitAndClose()
 ```
