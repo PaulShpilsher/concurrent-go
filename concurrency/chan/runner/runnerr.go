@@ -2,7 +2,6 @@ package runner
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"math"
 	"runtime"
@@ -86,7 +85,7 @@ func (r *channelRunner) Run(task func()) error {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				fmt.Println("Recovered panic in goroutine", r)
+				log.Println("Recovered panic in goroutine", r)
 			}
 			atomic.AddInt32(&r.executingCount, -1)
 			r.freeSlots <- struct{}{}
