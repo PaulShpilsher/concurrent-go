@@ -55,18 +55,18 @@ import "github.com/PaulShpilsher/concurrent-go/concurrency/sync/runner"
 Use the runner
 
 ```go
- concurrentRunner := runner.New(quota)
+ theRunner := runner.New(quota)
  if err != nil {
     panic(err.Error())
  }
  
  for i := 0; i < 1000; i++ {
-  concurrentRunner.Run(func() {
+  theRunner.Run(func() {
    // put some code to be exectuted
   })
  }
 
- concurrentRunner.WaitAndClose()
+ theRunner.WaitAndClose()
 ```
 
 ## Examples
@@ -99,7 +99,7 @@ or
 make test-sync-runner
 ```
 
-## Acknowledgements <a name = "acknowledgement"></a>
+## Acknowledgements
 
 - Inspiration ["Simple Made Easy" - Rich Hickey (2011)](https://www.youtube.com/watch?v=SxdOUGdseq4)
 - References
