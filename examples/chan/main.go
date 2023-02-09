@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/PaulShpilsher/concurrent-go/runner"
+	"github.com/PaulShpilsher/concurrent-go/concurrency/chan/runner"
 )
 
 func worker(id int) {
@@ -23,15 +23,12 @@ func main() {
 	flag.IntVar(&numbeOfTasks, "tasks", 64, "the number of tasks we need to execute")
 	flag.Parse()
 
-	rand.Seed(time.Now().UnixNano())
-
-	fmt.Printf("Executing %d tasks with concurrency limit %d\n", numbeOfTasks, quota)
-
-	r, _ := runner.NewConcurrencyRunner(quota)
+	fmt.Printf("Executing %d tasks with concurrency limit %d using\n", numbeOfTasks, quota)
+	r := runner.New(quota)
 	for i := 0; i < numbeOfTasks; i++ {
 		id := i
 		r.Run(func() { worker(id) })
 	}
 
-	r.Close() // waits for all pending tasks to complete and closes runner
+	r.WaitAndClose()
 }
