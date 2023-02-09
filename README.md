@@ -68,3 +68,27 @@ Use the runner
 
  concurrentRunner.WaitAndClose()
 ```
+
+## Examples
+
+The exapmples are in the ./examples/ directory.
+
+Running exaples:
+
+```shell
+make run-example-channel
+```
+
+or
+
+```shell
+make run-example-sync
+```
+
+
+- Sync based exapmple in the ./examples/sync/ directory
+
+## Acknowledgements <a name = "acknowledgement"></a>
+
+- Inspiration ["Simple Made Easy" - Rich Hickey (2011)](https://www.youtube.com/watch?v=SxdOUGdseq4)
+- References
