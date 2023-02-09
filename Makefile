@@ -10,6 +10,11 @@ test-sync-runner:
 	go test -v ./concurrency/sync/runner/runner_test.go
 
 
-.PHONY: run-example
-run-example:
-	go run ./examples/main.go -kind=sync -limit=10 -tasks=500
+.PHONY: run-example-channel
+run-example-channel:
+	go run ./examples/chan/main.go
+
+
+.PHONY: run-example-sync
+run-example-sync:
+	go run ./examples/sync/main.go
