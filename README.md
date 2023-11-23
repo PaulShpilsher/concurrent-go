@@ -21,7 +21,7 @@ type Runner interface {
    Run(task func()) error
 
    // Waits for all running functions to complete and frees resources.
-   WaitAndClose()
+   WaitAndClose() error
 
    // Returns the number of currently executing functions.
    GetNumberOfRunningTasks() int
@@ -58,7 +58,7 @@ Use the runner
 ```go
  theRunner := runner.New(quota)
  if err != nil {
-    panic(err.Error())
+    panic(err)
  }
  
  for i := 0; i < 1000; i++ {
@@ -91,13 +91,13 @@ make run-example-sync
 Running unit tests using make utility:
 
 ```shell
-make test-channel-runner
+make test
 ```
 
-or
+Benchmarks:
 
 ```shell
-make test-sync-runner
+make bench
 ```
 
 ## Acknowledgements
