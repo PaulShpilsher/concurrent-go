@@ -2,7 +2,6 @@ package runner
 
 import (
 	"context"
-	"errors"
 	"log"
 	"math"
 	"runtime"
@@ -46,11 +45,11 @@ func New(quota int) concurrency.Runner {
 // function finishes.
 func (r *semaphoreRunner) Run(task func()) error {
 	if task == nil {
-		return errors.New("nil argument")
+		return concurrency.ErrNilArgument
 	}
 
 	if r.closed {
-		return errors.New("runned closed")
+		return concurrency.ErrRunnerClosed
 	}
 
 	if err := r.sem.Acquire(r.ctx, 1); err != nil {

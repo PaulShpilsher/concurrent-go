@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"errors"
 	"log"
 	"math"
 	"runtime"
@@ -69,15 +68,15 @@ func (r *channelRunner) GetQuota() int {
 // a call to this function will block until another running function finishes.
 func (r *channelRunner) Run(task func()) error {
 	if task == nil {
-		return errors.New("nil argument")
+		return concurrency.ErrNilArgument
 	}
 
 	if r.closed {
-		return errors.New("runned closed")
+		return concurrency.ErrRunnerClosed
 	}
 
 	if _, ok := <-r.freeSlots; !ok {
-		return errors.New("channel closed")
+		return concurrency.ErrChannelClosed
 	}
 
 	atomic.AddInt32(&r.executingCount, 1)
