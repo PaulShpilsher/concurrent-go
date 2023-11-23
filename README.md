@@ -1,5 +1,5 @@
 # Golang concurrent function runner with quota
-[![Go Report Card](https://goreportcard.com/badge/github.com/PaulShpilsher/concurrent-go)](https://goreportcard.com/report/github.com/PaulShpilsher/concurrent-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/paulshpilsher/concurrent-go)](https://goreportcard.com/report/github.com/paulshpilsher/concurrent-go)
 
 A concurrent function runner with quota on how many functions can be executing at the same time.
 
@@ -36,7 +36,7 @@ type Runner interface {
 Get the package
 
 ```bash
-go get github.com/PaulShpilsher/concurrent-go
+go get github.com/paulshpilsher/concurrent-go
 ```
 
 In code import runner.
@@ -44,13 +44,13 @@ In code import runner.
 To use channel-based runner:
 
 ```go
-import "github.com/PaulShpilsher/concurrent-go/concurrency/chan/runner"
+import "github.com/paulshpilsher/concurrent-go/concurrency/chan/runner"
 ```
 
 To use sync-based runner:
 
 ```go
-import "github.com/PaulShpilsher/concurrent-go/concurrency/sync/runner"
+import "github.com/paulshpilsher/concurrent-go/concurrency/sync/runner"
 ```
 
 Use the runner

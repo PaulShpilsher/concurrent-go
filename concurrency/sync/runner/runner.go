@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"sync/atomic"
 
-	"github.com/PaulShpilsher/concurrent-go/concurrency"
+	"github.com/paulshpilsher/concurrent-go/concurrency"
 	"golang.org/x/sync/semaphore"
 )
 

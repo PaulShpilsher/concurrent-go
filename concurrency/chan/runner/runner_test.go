@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/PaulShpilsher/concurrent-go/concurrency/chan/runner"
+	"github.com/paulshpilsher/concurrent-go/concurrency/chan/runner"
 )
 
 func smallDelay() {
