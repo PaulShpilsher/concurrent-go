@@ -26,7 +26,6 @@ type channelRunner struct {
 func New(quota int) concurrency.Runner {
 	if quota <= 0 || quota > math.MaxInt32 {
 		quota = runtime.GOMAXPROCS(0)
-		log.Printf("Using default runner quota %d\n", quota)
 	}
 
 	slots := make(chan struct{}, quota)
@@ -70,7 +69,7 @@ func (r *channelRunner) GetQuota() int {
 // a call to this function will block until another running function finishes.
 func (r *channelRunner) Run(task func()) error {
 	if task == nil {
-		return errors.New("nil  argument")
+		return errors.New("nil argument")
 	}
 
 	if r.closed {
@@ -85,7 +84,7 @@ func (r *channelRunner) Run(task func()) error {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				log.Println("Recovered panic in goroutine", r)
+				log.Printf("panic recovered in goroutine %v", r)
 			}
 			atomic.AddInt32(&r.executingCount, -1)
 			r.freeSlots <- struct{}{}
