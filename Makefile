@@ -6,7 +6,6 @@ test:
 bench:
 	go test -bench . ./...
 
-
 .PHONY: run-example-channel
 run-example-channel:
 	go run ./examples/chan/main.go
