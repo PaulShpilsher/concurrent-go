@@ -113,3 +113,10 @@ func TestQuota(t *testing.T) {
 		t.Errorf("Exoected quota 10, actual %d", actual)
 	}
 }
+func BenchmarkChannelRunner(b *testing.B) {
+	r := runner.New(2)
+	for i := 0; i < b.N; i++ {
+		r.Run(func() {})
+	}
+	r.WaitAndClose()
+}
