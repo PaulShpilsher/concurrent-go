@@ -1,4 +1,4 @@
-# Golang concurrent function runner with quota
+# Golang concurrent function (goroutine) runner with quota
 [![Go Report Card](https://goreportcard.com/badge/github.com/paulshpilsher/concurrent-go)](https://goreportcard.com/report/github.com/paulshpilsher/concurrent-go)
 
 A concurrent function runner with quota on how many functions can be executing at the same time.
