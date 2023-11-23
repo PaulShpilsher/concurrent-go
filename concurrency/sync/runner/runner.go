@@ -2,13 +2,12 @@ package runner
 
 import (
 	"context"
-	"errors"
 	"log"
 	"math"
 	"runtime"
 	"sync/atomic"
 
-	"github.com/PaulShpilsher/concurrent-go/concurrency"
+	"github.com/paulshpilsher/concurrent-go/concurrency"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -29,7 +28,6 @@ type semaphoreRunner struct {
 func New(quota int) concurrency.Runner {
 	if quota <= 0 || quota > math.MaxInt32 {
 		quota = runtime.GOMAXPROCS(0)
-		log.Printf("Using default runner quota %d\n", quota)
 	}
 
 	return &semaphoreRunner{
@@ -47,15 +45,14 @@ func New(quota int) concurrency.Runner {
 // function finishes.
 func (r *semaphoreRunner) Run(task func()) error {
 	if task == nil {
-		return errors.New("nil  argument")
+		return concurrency.ErrNilArgument
 	}
 
 	if r.closed {
-		return errors.New("runned closed")
+		return concurrency.ErrRunnerClosed
 	}
 
 	if err := r.sem.Acquire(r.ctx, 1); err != nil {
-		log.Printf("Failed to acquire semaphore: %v\n", err)
 		return err
 	}
 
@@ -63,7 +60,7 @@ func (r *semaphoreRunner) Run(task func()) error {
 	go func() {
 		defer func() {
 			if recovered := recover(); recovered != nil {
-				log.Printf("Recovered panic in goroutine %v", recovered)
+				log.Printf("panic recovered in goroutine %v", recovered)
 			}
 			atomic.AddInt32(&r.executingCount, -1)
 			r.sem.Release(1)
@@ -78,14 +75,15 @@ func (r *semaphoreRunner) Run(task func()) error {
 // Waits for all running functions to complete,
 // Then releases internally used resources.
 // No more calls to Run() are possible.
-func (r *semaphoreRunner) WaitAndClose() {
+func (r *semaphoreRunner) WaitAndClose() error {
 	if !r.closed {
 		r.closed = true
 		if err := r.sem.Acquire(r.ctx, int64(r.quota)); err != nil {
-			log.Printf("Failed to acquire semaphore: %v", err)
+			return err
 		}
 		r.sem = nil
 	}
+	return nil
 }
 
 // Returns the number of currently executing functions

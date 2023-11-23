@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/PaulShpilsher/concurrent-go/concurrency/sync/runner"
+	"github.com/paulshpilsher/concurrent-go/concurrency/sync/runner"
 )
 
 func smallDelay() {
@@ -112,4 +112,12 @@ func TestQuota(t *testing.T) {
 	if actual != 10 {
 		t.Errorf("Exoected quota 10, actual %d", actual)
 	}
+}
+
+func BenchmarkSyncRunner(b *testing.B) {
+	r := runner.New(2)
+	for i := 0; i < b.N; i++ {
+		r.Run(func() {})
+	}
+	r.WaitAndClose()
 }

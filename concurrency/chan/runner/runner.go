@@ -1,13 +1,12 @@
 package runner
 
 import (
-	"errors"
 	"log"
 	"math"
 	"runtime"
 	"sync/atomic"
 
-	"github.com/PaulShpilsher/concurrent-go/concurrency"
+	"github.com/paulshpilsher/concurrent-go/concurrency"
 )
 
 type channelRunner struct {
@@ -26,7 +25,6 @@ type channelRunner struct {
 func New(quota int) concurrency.Runner {
 	if quota <= 0 || quota > math.MaxInt32 {
 		quota = runtime.GOMAXPROCS(0)
-		log.Printf("Using default runner quota %d\n", quota)
 	}
 
 	slots := make(chan struct{}, quota)
@@ -45,7 +43,7 @@ func New(quota int) concurrency.Runner {
 // Waits for all running functions to complete,
 // Then releases internally used resources.
 // No more calls to Run() are possible.
-func (r *channelRunner) WaitAndClose() {
+func (r *channelRunner) WaitAndClose() error {
 	if !r.closed {
 		r.closed = true
 		for i := 0; i < r.quota; i++ {
@@ -53,6 +51,7 @@ func (r *channelRunner) WaitAndClose() {
 		}
 		close(r.freeSlots)
 	}
+	return nil
 }
 
 // Gets number of currently executing routines
@@ -70,22 +69,22 @@ func (r *channelRunner) GetQuota() int {
 // a call to this function will block until another running function finishes.
 func (r *channelRunner) Run(task func()) error {
 	if task == nil {
-		return errors.New("nil  argument")
+		return concurrency.ErrNilArgument
 	}
 
 	if r.closed {
-		return errors.New("runned closed")
+		return concurrency.ErrRunnerClosed
 	}
 
 	if _, ok := <-r.freeSlots; !ok {
-		return errors.New("channel closed")
+		return concurrency.ErrChannelClosed
 	}
 
 	atomic.AddInt32(&r.executingCount, 1)
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				log.Println("Recovered panic in goroutine", r)
+				log.Printf("panic recovered in goroutine %v", r)
 			}
 			atomic.AddInt32(&r.executingCount, -1)
 			r.freeSlots <- struct{}{}

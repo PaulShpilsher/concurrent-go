@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/PaulShpilsher/concurrent-go/concurrency/chan/runner"
+	"github.com/paulshpilsher/concurrent-go/concurrency/chan/runner"
 )
 
 func worker(id int) {

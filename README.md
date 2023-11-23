@@ -1,5 +1,5 @@
 # Golang concurrent function runner with quota
-[![Go Report Card](https://goreportcard.com/badge/github.com/PaulShpilsher/concurrent-go)](https://goreportcard.com/report/github.com/PaulShpilsher/concurrent-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/paulshpilsher/concurrent-go)](https://goreportcard.com/report/github.com/paulshpilsher/concurrent-go)
 
 A concurrent function runner with quota on how many functions can be executing at the same time.
 
@@ -21,7 +21,7 @@ type Runner interface {
    Run(task func()) error
 
    // Waits for all running functions to complete and frees resources.
-   WaitAndClose()
+   WaitAndClose() error
 
    // Returns the number of currently executing functions.
    GetNumberOfRunningTasks() int
@@ -36,7 +36,7 @@ type Runner interface {
 Get the package
 
 ```bash
-go get github.com/PaulShpilsher/concurrent-go
+go get github.com/paulshpilsher/concurrent-go
 ```
 
 In code import runner.
@@ -44,13 +44,13 @@ In code import runner.
 To use channel-based runner:
 
 ```go
-import "github.com/PaulShpilsher/concurrent-go/concurrency/chan/runner"
+import "github.com/paulshpilsher/concurrent-go/concurrency/chan/runner"
 ```
 
 To use sync-based runner:
 
 ```go
-import "github.com/PaulShpilsher/concurrent-go/concurrency/sync/runner"
+import "github.com/paulshpilsher/concurrent-go/concurrency/sync/runner"
 ```
 
 Use the runner
@@ -58,7 +58,7 @@ Use the runner
 ```go
  theRunner := runner.New(quota)
  if err != nil {
-    panic(err.Error())
+    panic(err)
  }
  
  for i := 0; i < 1000; i++ {
@@ -91,13 +91,13 @@ make run-example-sync
 Running unit tests using make utility:
 
 ```shell
-make test-channel-runner
+make test
 ```
 
-or
+Benchmarks:
 
 ```shell
-make test-sync-runner
+make bench
 ```
 
 ## Acknowledgements
