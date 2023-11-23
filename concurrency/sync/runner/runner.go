@@ -75,14 +75,15 @@ func (r *semaphoreRunner) Run(task func()) error {
 // Waits for all running functions to complete,
 // Then releases internally used resources.
 // No more calls to Run() are possible.
-func (r *semaphoreRunner) WaitAndClose() {
+func (r *semaphoreRunner) WaitAndClose() error {
 	if !r.closed {
 		r.closed = true
 		if err := r.sem.Acquire(r.ctx, int64(r.quota)); err != nil {
-			log.Printf("Failed to acquire semaphore: %v", err)
+			return err
 		}
 		r.sem = nil
 	}
+	return nil
 }
 
 // Returns the number of currently executing functions

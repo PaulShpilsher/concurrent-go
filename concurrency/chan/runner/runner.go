@@ -43,7 +43,7 @@ func New(quota int) concurrency.Runner {
 // Waits for all running functions to complete,
 // Then releases internally used resources.
 // No more calls to Run() are possible.
-func (r *channelRunner) WaitAndClose() {
+func (r *channelRunner) WaitAndClose() error {
 	if !r.closed {
 		r.closed = true
 		for i := 0; i < r.quota; i++ {
@@ -51,6 +51,7 @@ func (r *channelRunner) WaitAndClose() {
 		}
 		close(r.freeSlots)
 	}
+	return nil
 }
 
 // Gets number of currently executing routines

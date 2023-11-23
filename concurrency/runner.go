@@ -6,7 +6,7 @@ type Runner interface {
 	Run(task func()) error
 
 	// Waits for all running functions to complete and frees resources.
-	WaitAndClose()
+	WaitAndClose() error
 
 	// Returns the number of currently executing functions.
 	GetNumberOfRunningTasks() int
