@@ -29,7 +29,6 @@ type semaphoreRunner struct {
 func New(quota int) concurrency.Runner {
 	if quota <= 0 || quota > math.MaxInt32 {
 		quota = runtime.GOMAXPROCS(0)
-		log.Printf("Using default runner quota %d\n", quota)
 	}
 
 	return &semaphoreRunner{
@@ -47,7 +46,7 @@ func New(quota int) concurrency.Runner {
 // function finishes.
 func (r *semaphoreRunner) Run(task func()) error {
 	if task == nil {
-		return errors.New("nil  argument")
+		return errors.New("nil argument")
 	}
 
 	if r.closed {
@@ -55,7 +54,6 @@ func (r *semaphoreRunner) Run(task func()) error {
 	}
 
 	if err := r.sem.Acquire(r.ctx, 1); err != nil {
-		log.Printf("Failed to acquire semaphore: %v\n", err)
 		return err
 	}
 
@@ -63,7 +61,7 @@ func (r *semaphoreRunner) Run(task func()) error {
 	go func() {
 		defer func() {
 			if recovered := recover(); recovered != nil {
-				log.Printf("Recovered panic in goroutine %v", recovered)
+				log.Printf("panic recovered in goroutine %v", recovered)
 			}
 			atomic.AddInt32(&r.executingCount, -1)
 			r.sem.Release(1)
